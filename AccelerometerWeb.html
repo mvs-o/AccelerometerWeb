@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Пример Accelerometer API</title>
+</head>
+<body>
+	<div class="coordinates animate done">
+		<h4>acceleration:</h4>
+		<div>
+			x: <span id="acceleration-x">0m/s²</span>
+		</div>
+		<div>
+			y: <span id="acceleration-y">0m/s²</span>
+		</div>
+		<div>
+			z: <span id="acceleration-z">0m/s²</span>
+		</div>
+
+		<h4>accelerationIncludingGravity:</h4>
+		<div>
+			x: <span id="acceleration-gravity-x">0m/s²</span>
+		</div>
+		<div>
+			y: <span id="acceleration-gravity-y">0m/s²</span>
+		</div>
+		<div>
+			z: <span id="acceleration-gravity-z">0m/s²</span>
+		</div>
+
+		<h4>rotationRate:</h4>
+		<div>
+			alpha: <span id="rotation-alpha">0°/s</span>
+		</div>
+		<div>
+			beta: <span id="rotation-beta">0°/s</span>
+		</div>
+		<div>
+			gamma: <span id="rotation-gamma">0°/s</span>
+		</div>
+
+		<h4>other :</h4>
+		<div>
+			interval : <span id="interval">0</span><span>mc</span>
+		</div>
+		<div>
+			timeout : <span id="timeout">0</span><span>mc</span>
+		</div>
+		<div>
+			max-acceleration : <span id="max-acceleration">0</span><span>m/s²</span>
+		</div>
+
+		<h4>velocity:</h4>
+		<div>
+			x: <span id="velocity-x">0</span><span>m/c</span>
+		</div>
+		<div>
+			y: <span id="velocity-y">0</span><span>m/c</span>
+		</div>
+		<div>
+			z: <span id="velocity-z">0</span><span>m/c</span>
+		</div>
+		<div>
+			xyz: <span id="velocity-xyz">0</span><span>m/c</span>
+		</div>
+
+
+		<h4>offset:</h4>
+		<div>
+			x: <span id="offset-x">0</span><span>m</span>
+		</div>
+		<div>
+			y: <span id="offset-y">0</span><span>m</span>
+		</div>
+		<div>
+			z: <span id="offset-z">0</span><span>m</span>
+		</div>
+		<div>
+			xyz: <span id="offset-xyz">0</span><span>m</span>
+		</div>
+	</div>
+
+	<div>
+		<button onclick="Reset()">Reset</button>
+	</div>
+	<script>
+		var start = performance.now();
+		var end = performance.now();
+
+		function Reset() {
+
+			document.getElementById('velocity-x').innerHTML = "0";
+			document.getElementById('velocity-y').innerHTML = "0";
+			document.getElementById('velocity-z').innerHTML = "0";
+			document.getElementById('velocity-xyz').innerHTML = "0";
+
+			document.getElementById('offset-x').innerHTML = "0";
+			document.getElementById('offset-y').innerHTML = "0";
+			document.getElementById('offset-z').innerHTML = "0";
+			document.getElementById('offset-xyz').innerHTML = "0";
+		}
+		async function getMotion() {
+			if (!window.DeviceMotionEvent || !window.DeviceMotionEvent.requestPermission) {
+				return alert("Your current device does not have access to the DeviceMotion event");
+			}
+
+			let permission = await window.DeviceMotionEvent.requestPermission();
+			if (permission !== "granted") {
+				return alert("You must grant access to the device's sensor for this demo");
+			}
+		}
+
+		window.addEventListener("devicemotion", function(e) {
+			document.getElementById('acceleration-x').innerHTML = e.acceleration.x.toFixed(8)+"m/s²";
+			document.getElementById('acceleration-y').innerHTML = e.acceleration.y.toFixed(8)+"m/s²";
+			document.getElementById('acceleration-z').innerHTML = e.acceleration.z.toFixed(8)+"m/s²";
+
+			document.getElementById('acceleration-gravity-x').innerHTML = e.accelerationIncludingGravity.x.toFixed(8)+"m/s²";
+			document.getElementById('acceleration-gravity-y').innerHTML = e.accelerationIncludingGravity.y.toFixed(8)+"m/s²";
+			document.getElementById('acceleration-gravity-z').innerHTML = e.accelerationIncludingGravity.z.toFixed(8)+"m/s²";
+
+			document.getElementById('rotation-alpha').innerHTML = e.rotationRate.alpha.toFixed(8)+"°/s";
+			document.getElementById('rotation-beta').innerHTML = e.rotationRate.beta.toFixed(8)+"°/s";
+			document.getElementById('rotation-gamma').innerHTML = e.rotationRate.gamma.toFixed(8)+"°/s";
+
+			/*Прочее*/
+			end = performance.now();
+			var time = end - start;
+			start = performance.now();
+
+			document.getElementById('timeout').innerHTML = time;
+			document.getElementById('interval').innerHTML = e.interval;
+			document.getElementById('max-acceleration').innerHTML = Math.max(
+				parseFloat(document.getElementById('max-acceleration').innerHTML),
+				parseFloat(document.getElementById('acceleration-x').innerHTML),
+				parseFloat(document.getElementById('acceleration-y').innerHTML),
+				parseFloat(document.getElementById('acceleration-z').innerHTML));
+
+			/*Скорость*/
+			if ((Math.round((e.acceleration.x+e.acceleration.y+e.acceleration.z)*1000)/1000) == 0) {
+				document.getElementById('velocity-x').innerHTML = 0;
+				document.getElementById('velocity-y').innerHTML = 0;
+				document.getElementById('velocity-z').innerHTML = 0;
+
+			} else {
+				document.getElementById('velocity-x').innerHTML = (
+					parseFloat(document.getElementById('velocity-x').innerHTML) + e.acceleration.x*e.interval/1000
+				).toFixed(3);
+
+				document.getElementById('velocity-y').innerHTML = (
+					parseFloat(document.getElementById('velocity-y').innerHTML) + e.acceleration.y*e.interval/1000
+				).toFixed(3);
+
+				document.getElementById('velocity-z').innerHTML = (
+					parseFloat(document.getElementById('velocity-z').innerHTML) + e.acceleration.z*e.interval/1000
+				).toFixed(3);
+			}
+
+			document.getElementById('velocity-xyz').innerHTML = (
+				(
+					parseFloat(document.getElementById('velocity-x').innerHTML)**2+
+					parseFloat(document.getElementById('velocity-y').innerHTML)**2+
+					parseFloat(document.getElementById('velocity-z').innerHTML)**2
+				)**(1/2)
+			).toFixed(2);
+
+			/*перемещение*/
+
+			document.getElementById('offset-x').innerHTML = (
+				parseFloat(document.getElementById('offset-x').innerHTML) + parseFloat(document.getElementById('velocity-x').innerHTML)*e.interval/1000
+			).toFixed(8);
+
+			document.getElementById('offset-y').innerHTML = (
+				parseFloat(document.getElementById('offset-y').innerHTML) + parseFloat(document.getElementById('velocity-y').innerHTML)*e.interval/1000
+			).toFixed(8);
+
+			document.getElementById('offset-z').innerHTML = (
+				parseFloat(document.getElementById('offset-z').innerHTML) + parseFloat(document.getElementById('velocity-z').innerHTML)*e.interval/1000
+			).toFixed(8);
+
+			document.getElementById('offset-xyz').innerHTML = (
+				(
+					parseFloat(document.getElementById('offset-x').innerHTML)**2+
+					parseFloat(document.getElementById('offset-y').innerHTML)**2+
+					parseFloat(document.getElementById('offset-z').innerHTML)**2
+				)**(1/2)
+			).toFixed(8);
+		});
+
+	</script>
+</body>
+</html>
