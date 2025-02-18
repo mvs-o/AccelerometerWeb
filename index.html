@@ -1,103 +1,113 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Пример Accelerometer API</title>
+	<title>Accelerometer API</title>
+	<meta charset="UTF-8">
 </head>
 <body>
 	<div class="coordinates animate done">
-		<h4>acceleration:</h4>
+		<h4>Ускорение:</h4>
 		<div>
-			x: <span id="acceleration-x">0m/s²</span>
+			x: <span id="acceleration-x">0</span><span> м/с²</span>
 		</div>
 		<div>
-			y: <span id="acceleration-y">0m/s²</span>
+			y: <span id="acceleration-y">0</span><span> м/с²</span>
 		</div>
 		<div>
-			z: <span id="acceleration-z">0m/s²</span>
-		</div>
-
-		<h4>accelerationIncludingGravity:</h4>
-		<div>
-			x: <span id="acceleration-gravity-x">0m/s²</span>
+			z: <span id="acceleration-z">0</span><span> м/с²</span>
 		</div>
 		<div>
-			y: <span id="acceleration-gravity-y">0m/s²</span>
+			xyz: <span id="acceleration-xyz">0</span><span> м/с²</span>
 		</div>
 		<div>
-			z: <span id="acceleration-gravity-z">0m/s²</span>
+			max: <span id="max-acceleration">0</span><span> м/с²</span>
 		</div>
 
-		<h4>rotationRate:</h4>
+		<h4>Ускорение с гравитацией:</h4>
 		<div>
-			alpha: <span id="rotation-alpha">0°/s</span>
+			x: <span id="acceleration-gravity-x">0</span><span> м/с²</span>
 		</div>
 		<div>
-			beta: <span id="rotation-beta">0°/s</span>
+			y: <span id="acceleration-gravity-y">0</span><span> м/с²</span>
 		</div>
 		<div>
-			gamma: <span id="rotation-gamma">0°/s</span>
-		</div>
-
-		<h4>other :</h4>
-		<div>
-			interval : <span id="interval">0</span><span>mc</span>
+			z: <span id="acceleration-gravity-z">0</span><span> м/с²</span>
 		</div>
 		<div>
-			timeout : <span id="timeout">0</span><span>mc</span>
-		</div>
-		<div>
-			max-acceleration : <span id="max-acceleration">0</span><span>m/s²</span>
+			xyz: <span id="acceleration-gravity-xyz">0</span><span> м/с²</span>
 		</div>
 
-		<h4>velocity:</h4>
+		<h4>Вращение:</h4>
 		<div>
-			x: <span id="velocity-x">0</span><span>m/c</span>
+			alpha: <span id="rotation-alpha">0</span><span>°/с</span>
 		</div>
 		<div>
-			y: <span id="velocity-y">0</span><span>m/c</span>
+			beta: <span id="rotation-beta">0</span><span>°/с</span>
 		</div>
 		<div>
-			z: <span id="velocity-z">0</span><span>m/c</span>
-		</div>
-		<div>
-			xyz: <span id="velocity-xyz">0</span><span>m/c</span>
+			gamma: <span id="rotation-gamma">0</span><span>°/с</span>
 		</div>
 
+		<h4>Прочее:</h4>
+		<div>
+			interval: <span id="interval">0</span><span> мс</span>
+		</div>
+		<div>
+			timeout: <span id="timeout">0</span><span> мс</span>
+		</div>
 
-		<h4>offset:</h4>
+		<h4>Скорость:</h4>
 		<div>
-			x: <span id="offset-x">0</span><span>m</span>
+			x: <span id="velocity-x">0</span><span> м/с</span>
 		</div>
 		<div>
-			y: <span id="offset-y">0</span><span>m</span>
+			y: <span id="velocity-y">0</span><span> м/с</span>
 		</div>
 		<div>
-			z: <span id="offset-z">0</span><span>m</span>
+			z: <span id="velocity-z">0</span><span> м/с</span>
 		</div>
 		<div>
-			xyz: <span id="offset-xyz">0</span><span>m</span>
+			xyz: <span id="velocity-xyz">0</span><span> м/с</span>
+		</div>
+
+		<h4>Перемещение:</h4>
+		<div>
+			x: <span id="offset-x">0</span><span> м</span>
+		</div>
+		<div>
+			y: <span id="offset-y">0</span><span> м</span>
+		</div>
+		<div>
+			z: <span id="offset-z">0</span><span> м</span>
+		</div>
+		<div>
+			xyz: <span id="offset-xyz">0</span><span> м</span>
 		</div>
 	</div>
 
 	<div>
-		<button onclick="Reset()">Reset</button>
+		<button onclick="reset()">Reset</button>
 	</div>
 	<script>
-		var start = performance.now();
-		var end = performance.now();
-
-		function Reset() {
-
-			document.getElementById('velocity-x').innerHTML = "0";
-			document.getElementById('velocity-y').innerHTML = "0";
-			document.getElementById('velocity-z').innerHTML = "0";
-			document.getElementById('velocity-xyz').innerHTML = "0";
-
-			document.getElementById('offset-x').innerHTML = "0";
-			document.getElementById('offset-y').innerHTML = "0";
-			document.getElementById('offset-z').innerHTML = "0";
-			document.getElementById('offset-xyz').innerHTML = "0";
+		function show(span, value, digits) {
+			if (digits !== undefined) {
+				value = value.toFixed(3);
+			}
+			document.getElementById(span).innerHTML = value;
 		}
+
+		let start = performance.now();
+
+		let ux, uy, uz, x, y, z, max_a;
+
+		function reset() {
+			ux = uy = uz = 0;
+			x = y = z = 0;
+			max_a = 0;
+		}
+		
+		reset();
+
 		async function getMotion() {
 			if (!window.DeviceMotionEvent || !window.DeviceMotionEvent.requestPermission) {
 				return alert("Your current device does not have access to the DeviceMotion event");
@@ -110,82 +120,69 @@
 		}
 
 		window.addEventListener("devicemotion", function(e) {
-			document.getElementById('acceleration-x').innerHTML = e.acceleration.x.toFixed(8)+"m/s²";
-			document.getElementById('acceleration-y').innerHTML = e.acceleration.y.toFixed(8)+"m/s²";
-			document.getElementById('acceleration-z').innerHTML = e.acceleration.z.toFixed(8)+"m/s²";
+			// Ускорение
+			const ax = e.acceleration.x;
+			const ay = e.acceleration.y;
+			const az = e.acceleration.z;
+			const a = Math.hypot(ax, ay, az);
+			max_a = Math.max(max_a, a);
 
-			document.getElementById('acceleration-gravity-x').innerHTML = e.accelerationIncludingGravity.x.toFixed(8)+"m/s²";
-			document.getElementById('acceleration-gravity-y').innerHTML = e.accelerationIncludingGravity.y.toFixed(8)+"m/s²";
-			document.getElementById('acceleration-gravity-z').innerHTML = e.accelerationIncludingGravity.z.toFixed(8)+"m/s²";
+			// Ускорение с гравитацией
+			const agx = e.accelerationIncludingGravity.x;
+			const agy = e.accelerationIncludingGravity.y;
+			const agz = e.accelerationIncludingGravity.z;
+			const ag = Math.hypot(agx, agy, agz);
 
-			document.getElementById('rotation-alpha').innerHTML = e.rotationRate.alpha.toFixed(8)+"°/s";
-			document.getElementById('rotation-beta').innerHTML = e.rotationRate.beta.toFixed(8)+"°/s";
-			document.getElementById('rotation-gamma').innerHTML = e.rotationRate.gamma.toFixed(8)+"°/s";
+			// Прочее
+			const end = performance.now();
+			const time = end - start;
+			start = end;
+			const interval = e.interval / 1000;
 
-			/*Прочее*/
-			end = performance.now();
-			var time = end - start;
-			start = performance.now();
-
-			document.getElementById('timeout').innerHTML = time;
-			document.getElementById('interval').innerHTML = e.interval;
-			document.getElementById('max-acceleration').innerHTML = Math.max(
-				parseFloat(document.getElementById('max-acceleration').innerHTML),
-				parseFloat(document.getElementById('acceleration-x').innerHTML),
-				parseFloat(document.getElementById('acceleration-y').innerHTML),
-				parseFloat(document.getElementById('acceleration-z').innerHTML));
-
-			/*Скорость*/
-			if ((Math.round((e.acceleration.x+e.acceleration.y+e.acceleration.z)*1000)/1000) == 0) {
-				document.getElementById('velocity-x').innerHTML = 0;
-				document.getElementById('velocity-y').innerHTML = 0;
-				document.getElementById('velocity-z').innerHTML = 0;
-
+			// Скорость
+			if (Math.abs(a) < 1e-3) {
+				ux = 0;
+				uy = 0;
+				uz = 0;
 			} else {
-				document.getElementById('velocity-x').innerHTML = (
-					parseFloat(document.getElementById('velocity-x').innerHTML) + e.acceleration.x*e.interval/1000
-				).toFixed(3);
-
-				document.getElementById('velocity-y').innerHTML = (
-					parseFloat(document.getElementById('velocity-y').innerHTML) + e.acceleration.y*e.interval/1000
-				).toFixed(3);
-
-				document.getElementById('velocity-z').innerHTML = (
-					parseFloat(document.getElementById('velocity-z').innerHTML) + e.acceleration.z*e.interval/1000
-				).toFixed(3);
+				ux += ax * interval;
+				uy += ay * interval;
+				uz += az * interval;
 			}
 
-			document.getElementById('velocity-xyz').innerHTML = (
-				(
-					parseFloat(document.getElementById('velocity-x').innerHTML)**2+
-					parseFloat(document.getElementById('velocity-y').innerHTML)**2+
-					parseFloat(document.getElementById('velocity-z').innerHTML)**2
-				)**(1/2)
-			).toFixed(2);
+			// Перемещение
+			x += ux * interval;
+			y += uy * interval;
+			z += uz * interval;
 
-			/*перемещение*/
+			show('acceleration-x', ax, 3);
+			show('acceleration-y', ay, 3);
+			show('acceleration-z', az, 3);
+			show('acceleration-xyz', a, 3);
+			show('max-acceleration', max_a, 3);
 
-			document.getElementById('offset-x').innerHTML = (
-				parseFloat(document.getElementById('offset-x').innerHTML) + parseFloat(document.getElementById('velocity-x').innerHTML)*e.interval/1000
-			).toFixed(8);
+			show('acceleration-gravity-x', agx, 3);
+			show('acceleration-gravity-y', agy, 3);
+			show('acceleration-gravity-z', agz, 3);
+			show('acceleration-gravity-xyz', ag, 3);
 
-			document.getElementById('offset-y').innerHTML = (
-				parseFloat(document.getElementById('offset-y').innerHTML) + parseFloat(document.getElementById('velocity-y').innerHTML)*e.interval/1000
-			).toFixed(8);
+			show('rotation-alpha', e.rotationRate.alpha, 3);
+			show('rotation-beta', e.rotationRate.beta, 3);
+			show('rotation-gamma', e.rotationRate.gamma, 3);
 
-			document.getElementById('offset-z').innerHTML = (
-				parseFloat(document.getElementById('offset-z').innerHTML) + parseFloat(document.getElementById('velocity-z').innerHTML)*e.interval/1000
-			).toFixed(8);
+			show('timeout', time, 3);
+			show('interval', e.interval);
 
-			document.getElementById('offset-xyz').innerHTML = (
-				(
-					parseFloat(document.getElementById('offset-x').innerHTML)**2+
-					parseFloat(document.getElementById('offset-y').innerHTML)**2+
-					parseFloat(document.getElementById('offset-z').innerHTML)**2
-				)**(1/2)
-			).toFixed(8);
+			show('velocity-x', ux, 3);
+			show('velocity-y', uy, 3);
+			show('velocity-z', uz, 3);
+			show('velocity-xyz', Math.hypot(ux, uy, uz), 3);
+
+			show('offset-x', x, 3);
+			show('offset-y', y, 3);
+			show('offset-z', z, 3);
+			show('offset-xyz', Math.hypot(x, y, z), 3);
 		});
-
 	</script>
 </body>
 </html>
