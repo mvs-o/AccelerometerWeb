@@ -3,91 +3,73 @@
 <head>
 	<title>Accelerometer API</title>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="initial-scale=1">
+	<style type="text/css">
+		.container {
+			display: grid;
+			gap: 20px;
+			grid-template-columns: 120px 300px;
+		}
+	</style>
 </head>
 <body>
-	<div class="coordinates animate done">
-		<h4>Ускорение:</h4>
+	<div class="container">
 		<div>
-			x: <span id="acceleration-x">0</span><span> м/с²</span>
+			<b>Ускорение<br>с гравитацией:</b><br>
+			x: <span id="acceleration-gravity-x">0</span> м/с²<br>
+			y: <span id="acceleration-gravity-y">0</span> м/с²<br>
+			z: <span id="acceleration-gravity-z">0</span> м/с²<br>
+			xyz: <span id="acceleration-gravity-xyz">0</span> м/с²
 		</div>
 		<div>
-			y: <span id="acceleration-y">0</span><span> м/с²</span>
+			<b>Вращение:</b><br>
+			alpha: <span id="rotation-alpha">0</span>°/с<br>
+			beta: <span id="rotation-beta">0</span>°/с<br>
+			gamma: <span id="rotation-gamma">0</span>°/с<br><br>
+			<b>Прочее:</b><br>
+			interval: <span id="interval">0</span> мс<br>
+			time: <span id="time">0</span> с
 		</div>
 		<div>
-			z: <span id="acceleration-z">0</span><span> м/с²</span>
+			<b>Ускорение:</b><br>
+			x: <span id="acceleration-x">0</span> м/с²<br>
+			y: <span id="acceleration-y">0</span> м/с²<br>
+			z: <span id="acceleration-z">0</span> м/с²<br>
+			xyz: <span id="acceleration-xyz">0</span> м/с²<br>
+			max: <span id="acceleration-max">0</span> м/с²
 		</div>
 		<div>
-			xyz: <span id="acceleration-xyz">0</span><span> м/с²</span>
+			<canvas id="acceleration-chart"></canvas>
 		</div>
 		<div>
-			max: <span id="max-acceleration">0</span><span> м/с²</span>
-		</div>
-
-		<h4>Ускорение с гравитацией:</h4>
-		<div>
-			x: <span id="acceleration-gravity-x">0</span><span> м/с²</span>
-		</div>
-		<div>
-			y: <span id="acceleration-gravity-y">0</span><span> м/с²</span>
+			<b>Скорость:</b><br>
+			x: <span id="velocity-x">0</span> м/с<br>
+			y: <span id="velocity-y">0</span> м/с<br>
+			z: <span id="velocity-z">0</span> м/с<br>
+			xyz: <span id="velocity-xyz">0</span> м/с
 		</div>
 		<div>
-			z: <span id="acceleration-gravity-z">0</span><span> м/с²</span>
+			<canvas id="velocity-chart"></canvas>
 		</div>
 		<div>
-			xyz: <span id="acceleration-gravity-xyz">0</span><span> м/с²</span>
-		</div>
-
-		<h4>Вращение:</h4>
-		<div>
-			alpha: <span id="rotation-alpha">0</span><span>°/с</span>
-		</div>
-		<div>
-			beta: <span id="rotation-beta">0</span><span>°/с</span>
+			<b>Перемещение:</b><br>
+			x: <span id="offset-x">0</span> м<br>
+			y: <span id="offset-y">0</span> м<br>
+			z: <span id="offset-z">0</span> м<br>
+			xyz: <span id="offset-xyz">0</span> м
 		</div>
 		<div>
-			gamma: <span id="rotation-gamma">0</span><span>°/с</span>
-		</div>
-
-		<h4>Прочее:</h4>
-		<div>
-			interval: <span id="interval">0</span><span> мс</span>
-		</div>
-		<div>
-			timeout: <span id="timeout">0</span><span> мс</span>
-		</div>
-
-		<h4>Скорость:</h4>
-		<div>
-			x: <span id="velocity-x">0</span><span> м/с</span>
-		</div>
-		<div>
-			y: <span id="velocity-y">0</span><span> м/с</span>
-		</div>
-		<div>
-			z: <span id="velocity-z">0</span><span> м/с</span>
-		</div>
-		<div>
-			xyz: <span id="velocity-xyz">0</span><span> м/с</span>
-		</div>
-
-		<h4>Перемещение:</h4>
-		<div>
-			x: <span id="offset-x">0</span><span> м</span>
-		</div>
-		<div>
-			y: <span id="offset-y">0</span><span> м</span>
-		</div>
-		<div>
-			z: <span id="offset-z">0</span><span> м</span>
-		</div>
-		<div>
-			xyz: <span id="offset-xyz">0</span><span> м</span>
+			<canvas id="offset-chart"></canvas>
 		</div>
 	</div>
 
 	<div>
-		<button onclick="reset()">Reset</button>
+		<button onclick="reset()">Сброс</button>
+		<button onclick="record = true;">Начать запись</button>
+		<button onclick="record = false;">Остановить запись</button>
 	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script>
 		function show(span, value, digits) {
 			if (digits !== undefined) {
@@ -96,19 +78,19 @@
 			document.getElementById(span).innerHTML = value;
 		}
 
-		let start = performance.now();
-
-		let ux, uy, uz, x, y, z, max_a;
+		let start_time = performance.now();
+		let labels = [0];
+		let record = false;
 
 		function reset() {
-			ux = uy = uz = 0;
-			x = y = z = 0;
-			max_a = 0;
+			start_time = performance.now();
+			labels.length = 1;
+			a.reset();
+			u.reset();
+			d.reset();
 		}
-		
-		reset();
 
-		async function getMotion() {
+		/*async function getMotion() {
 			if (!window.DeviceMotionEvent || !window.DeviceMotionEvent.requestPermission) {
 				return alert("Your current device does not have access to the DeviceMotion event");
 			}
@@ -117,71 +99,117 @@
 			if (permission !== "granted") {
 				return alert("You must grant access to the device's sensor for this demo");
 			}
+		}*/
+
+		class Quantity {
+			constructor(quantity) {
+				this.quantity = quantity;
+				const ctx = document.getElementById(quantity + '-chart');
+				this.reset();
+				if (!ctx) return;
+				this.chart = new Chart(ctx, {
+					type: 'line',
+					data: {
+						labels,
+						datasets: [
+							{ label: 'x', data: this.xs },
+							{ label: 'y', data: this.ys },
+							{ label: 'z', data: this.zs }
+						]
+					},
+					options: {
+						elements: {
+							point:{
+								radius: 0
+							}
+						},
+						animation: false
+					}
+				});
+			}
+
+			reset() {
+				this.x = 0;
+				this.y = 0;
+				this.z = 0;
+				this.xyz = 0;
+				this.max = 0;
+				this.xs = [0];
+				this.ys = [0];
+				this.zs = [0];
+				this.redraw(true);
+			}
+
+			push_point(p) {
+				this.push(p.x, p.y, p.z);
+			}
+
+			push(x, y, z) {
+				this.x = x;
+				this.y = y;
+				this.z = z;
+				this.xyz = Math.hypot(x, y, z);
+				this.max = Math.max(this.max, this.xyz);
+				if (record && this.chart) {
+					this.xs.push(x);
+					this.ys.push(y);
+					this.zs.push(z);
+				}
+				this.redraw();
+			}
+
+			redraw(force) {
+				show(this.quantity + '-x', this.x, 3);
+				show(this.quantity + '-y', this.y, 3);
+				show(this.quantity + '-z', this.z, 3);
+				show(this.quantity + '-xyz', this.xyz, 3);
+				if ((force || record) && this.chart && this.xs.length % 2 == 1) {
+					this.chart.update();
+				}
+			}
 		}
 
+		const a = new Quantity('acceleration');
+		const ag = new Quantity('acceleration-gravity');
+		const u = new Quantity('velocity');
+		const d = new Quantity('offset');
+
 		window.addEventListener("devicemotion", function(e) {
-			// Ускорение
-			const ax = e.acceleration.x;
-			const ay = e.acceleration.y;
-			const az = e.acceleration.z;
-			const a = Math.hypot(ax, ay, az);
-			max_a = Math.max(max_a, a);
+			const time = performance.now() - start_time;
+			if (record) {
+				labels.push(Math.round(time) / 1000);
+			}
 
-			// Ускорение с гравитацией
-			const agx = e.accelerationIncludingGravity.x;
-			const agy = e.accelerationIncludingGravity.y;
-			const agz = e.accelerationIncludingGravity.z;
-			const ag = Math.hypot(agx, agy, agz);
-
-			// Прочее
-			const end = performance.now();
-			const time = end - start;
-			start = end;
 			const interval = e.interval / 1000;
+
+			// Ускорение
+			a.push_point(e.acceleration);
+			ag.push_point(e.accelerationIncludingGravity);
 
 			// Скорость
 			if (Math.abs(a) < 1e-3) {
-				ux = 0;
-				uy = 0;
-				uz = 0;
+				u.push(0, 0, 0);
 			} else {
-				ux += ax * interval;
-				uy += ay * interval;
-				uz += az * interval;
+				u.push(
+					u.x + a.x * interval,
+					u.y + a.y * interval,
+					u.z + a.z * interval
+				);
 			}
 
 			// Перемещение
-			x += ux * interval;
-			y += uy * interval;
-			z += uz * interval;
+			d.push(
+				d.x + u.x * interval,
+				d.y + u.y * interval,
+				d.z + u.z * interval
+			);
 
-			show('acceleration-x', ax, 3);
-			show('acceleration-y', ay, 3);
-			show('acceleration-z', az, 3);
-			show('acceleration-xyz', a, 3);
-			show('max-acceleration', max_a, 3);
-
-			show('acceleration-gravity-x', agx, 3);
-			show('acceleration-gravity-y', agy, 3);
-			show('acceleration-gravity-z', agz, 3);
-			show('acceleration-gravity-xyz', ag, 3);
-
+			show('acceleration-max', a.max, 3);
+			show('time', time / 1000, 3);
+			show('interval', e.interval);
 			show('rotation-alpha', e.rotationRate.alpha, 3);
 			show('rotation-beta', e.rotationRate.beta, 3);
 			show('rotation-gamma', e.rotationRate.gamma, 3);
-
-			show('timeout', time, 3);
-			show('interval', e.interval);
-
-			show('velocity-x', ux, 3);
-			show('velocity-y', uy, 3);
-			show('velocity-z', uz, 3);
-			show('velocity-xyz', Math.hypot(ux, uy, uz), 3);
-
-			show('offset-x', x, 3);
-			show('offset-y', y, 3);
-			show('offset-z', z, 3);
-			show('offset-xyz', Math.hypot(x, y, z), 3);
 		});
 	</script>
 </body>
