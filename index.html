@@ -73,7 +73,7 @@
 	<script>
 		function show(span, value, digits) {
 			if (digits !== undefined) {
-				value = value.toFixed(3);
+				value = value.toFixed(digits);
 			}
 			document.getElementById(span).innerHTML = value;
 		}
