@@ -101,6 +101,11 @@
 			}
 		}*/
 
+		function is_rare(n) {
+			while (n >= 64 && n % 2 == 0) n /= 2;
+			return n < 64;
+		}
+
 		class Quantity {
 			constructor(quantity) {
 				this.quantity = quantity;
@@ -170,7 +175,8 @@
 				show(this.quantity + '-y', this.y, 3);
 				show(this.quantity + '-z', this.z, 3);
 				show(this.quantity + '-xyz', this.xyz, 3);
-				if ((force || record) && this.chart && this.xs.length % 2 == 1) {
+				
+				if (this.chart && (force || record && is_rare(this.xs.length))) {
 					this.chart.update();
 				}
 			}
