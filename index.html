@@ -104,8 +104,15 @@
 		class Quantity {
 			constructor(quantity) {
 				this.quantity = quantity;
+				this.x = 0;
+				this.y = 0;
+				this.z = 0;
+				this.xyz = 0;
+				this.max = 0;
+				this.xs = [0];
+				this.ys = [0];
+				this.zs = [0];
 				const ctx = document.getElementById(quantity + '-chart');
-				this.reset();
 				if (!ctx) return;
 				this.chart = new Chart(ctx, {
 					type: 'line',
@@ -119,7 +126,7 @@
 					},
 					options: {
 						elements: {
-							point:{
+							point: {
 								radius: 0
 							}
 						},
@@ -134,9 +141,9 @@
 				this.z = 0;
 				this.xyz = 0;
 				this.max = 0;
-				this.xs = [0];
-				this.ys = [0];
-				this.zs = [0];
+				this.xs.length = 1;
+				this.ys.length = 1;
+				this.zs.length = 1;
 				this.redraw(true);
 			}
 
